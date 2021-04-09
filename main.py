@@ -1,6 +1,5 @@
 import discord, os, re
 from discord.ext import tasks
-from dotenv import load_dotenv
 from datetime import datetime
 
 DEBUG = True
@@ -8,7 +7,6 @@ def log(s):
     if DEBUG:
         print(s)
 
-load_dotenv()
 token = os.getenv("DISCORD_BOT_TOKEN")
 
 class TimeoutTim(discord.Client):
