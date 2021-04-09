@@ -96,6 +96,7 @@ class TimeoutTim(discord.Client):
             e.set_thumbnail(url="https://i.imgur.com/vazfrxN.png")
             e.add_field(name="!timeout @user [minutes in timeout]", value="Places @user in timeout for given amount of time.", inline=False)
             e.add_field(name="!free @user", value="Frees @user from timeout.", inline=False)
+            e.add_field(name="!add @user [minutes to add to timeout]", value="Adds given amount of time to @user's timeout.", inline=False)
             e.add_field(name="!timeleft", value="Gives time left in your timeout.", inline=False)
             e.add_field(name="!timeleft @user", value="Gives time left in @user's timeout.", inline=False)
             e.add_field(name="!help", value="What do you think this does?", inline=False)
@@ -163,7 +164,7 @@ class TimeoutTim(discord.Client):
                 else:
                     await channel.send("{} is not currently on timeout.".format(message.mentions[0].name))
             else:
-                await channel.send("Invalid command. Please use `!timeout @user [minutes in timeout]`")
+                await channel.send("Invalid command. Please use `!add @user [minutes to add to timeout]`")
                 return
 
         
