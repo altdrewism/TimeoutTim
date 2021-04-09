@@ -53,7 +53,7 @@ class TimeoutTim(discord.Client):
                 await member.remove_roles(*self.member_roles[member.id], reason="{} has been bad and was put in timeout as punishment".format(member.name))
             await member.add_roles(discord.utils.get(member.guild.roles, name="Timeout"), reason="{} has been bad and was put in timeout as punishment".format(member.name))
             
-            self.timedout[member.id] = (datetime.now(), minutes*60, member)
+            self.timedout[member.id] = [datetime.now(), minutes*60, member]
             await channel.send("{} has been sent to the shadow realm for {}.".format(member.name, self.sec2str(minutes*60)))
             await TOchannel.send("Hello, {}.\n\nYou have been sent here for {} minutes because you have been naughty. I hope you use this time as a chance to reflect on your actions and come up with a formal apology for what you have done.".format(member.mention, minutes))
             
@@ -159,7 +159,7 @@ class TimeoutTim(discord.Client):
             if (len(words) == 3) and (len(message.mentions) == 1) and (re.match('^[0-9]*$', words[2])):
                 if message.mentions[0].id in self.timedout:
                     minutes = int(words[2])
-                    await self.add_time(message.mentions[0], minutes)
+                    self.add_time(message.mentions[0], minutes)
                     await channel.send("Added {} minutes to {}'s timeout.".format(minutes, message.mentions[0]))
                 else:
                     await channel.send("{} is not currently on timeout.".format(message.mentions[0].name))
