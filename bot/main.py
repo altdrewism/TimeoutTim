@@ -69,6 +69,9 @@ class TimeoutTim(discord.Client):
         else:
             return
 
+    def add_time(self, member, minutes):
+        self.timedout[member.id][1] = self.timedout[member.id][1] + 60*minutes
+
         
 
     async def on_ready(self):
@@ -93,6 +96,7 @@ class TimeoutTim(discord.Client):
             e.set_thumbnail(url="https://i.imgur.com/vazfrxN.png")
             e.add_field(name="!timeout @user [minutes in timeout]", value="Places @user in timeout for given amount of time.", inline=False)
             e.add_field(name="!free @user", value="Frees @user from timeout.", inline=False)
+            e.add_field(name="!add @user [minutes to add to timeout]", value="Adds given amount of time to @user's timeout.", inline=False)
             e.add_field(name="!timeleft", value="Gives time left in your timeout.", inline=False)
             e.add_field(name="!timeleft @user", value="Gives time left in @user's timeout.", inline=False)
             e.add_field(name="!help", value="What do you think this does?", inline=False)
@@ -145,6 +149,22 @@ class TimeoutTim(discord.Client):
                     return
             else:
                 await channel.send("Invalid command. Please use `!timeleft @user`")
+                return
+
+        elif message.content.startswith("?add "):
+            if (discord.utils.get(user.roles, name="Owner") is None) and (discord.utils.get(user.roles, name="Admin") is None) and (discord.utils.get(user.roles, name="Staff") is None):
+                return
+            
+            words = [x.strip() for x in message.content.split(' ')]
+            if (len(words) == 3) and (len(message.mentions) == 1) and (re.match('^[0-9]*$', words[2])):
+                if message.mentions[0].id in self.timedout:
+                    minutes = int(words[2])
+                    await self.add_time(message.mentions[0], minutes)
+                    await channel.send("Added {} minutes to {}'s timeout.".format(minutes, message.mentions[0]))
+                else:
+                    await channel.send("{} is not currently on timeout.".format(message.mentions[0].name))
+            else:
+                await channel.send("Invalid command. Please use `!add @user [minutes to add to timeout]`")
                 return
 
         
