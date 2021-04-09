@@ -94,12 +94,12 @@ class TimeoutTim(discord.Client):
                     color = 0x7dcac0
                 )
             e.set_thumbnail(url="https://i.imgur.com/vazfrxN.png")
-            e.add_field(name="!timeout @user [minutes in timeout]", value="Places @user in timeout for given amount of time.", inline=False)
-            e.add_field(name="!free @user", value="Frees @user from timeout.", inline=False)
-            e.add_field(name="!add @user [minutes to add to timeout]", value="Adds given amount of time to @user's timeout.", inline=False)
-            e.add_field(name="!timeleft", value="Gives time left in your timeout.", inline=False)
-            e.add_field(name="!timeleft @user", value="Gives time left in @user's timeout.", inline=False)
-            e.add_field(name="!help", value="What do you think this does?", inline=False)
+            e.add_field(name="?timeout @user [minutes in timeout]", value="Places @user in timeout for given amount of time.", inline=False)
+            e.add_field(name="?free @user", value="Frees @user from timeout.", inline=False)
+            e.add_field(name="?add @user [minutes to add to timeout]", value="Adds given amount of time to @user's timeout.", inline=False)
+            e.add_field(name="?timeleft", value="Gives time left in your timeout.", inline=False)
+            e.add_field(name="?timeleft @user", value="Gives time left in @user's timeout.", inline=False)
+            e.add_field(name="?help", value="What do you think this does?", inline=False)
 
             
             await channel.send(embed=e)
