@@ -23,11 +23,11 @@ class TimeoutTim(discord.Client):
         m = int((time - 3600*h) / 60)
         s = time - 3600*h - 60*m
 
-        time_str = "{} seconds".format(s)
+        time_str = "{} second(s)".format(s)
         if m:
-            time_str = "{} minutes and {}".format(m, time_str)
+            time_str = "{} minute(s) and {}".format(m, time_str)
         if h:
-            time_str = "{} hours, {}".format(h, time_str)
+            time_str = "{} hour(s), {}".format(h, time_str)
 
         return time_str
 
@@ -55,7 +55,7 @@ class TimeoutTim(discord.Client):
             
             self.timedout[member.id] = [datetime.now(), minutes*60, member]
             await channel.send("{} has been sent to the shadow realm for {}.".format(member.name, self.sec2str(minutes*60)))
-            await TOchannel.send("Hello, {}.\n\nYou have been sent here for {} minutes because you have been naughty. I hope you use this time as a chance to reflect on your actions and come up with a formal apology for what you have done.".format(member.mention, minutes))
+            await TOchannel.send("Hello, {}.\n\nYou have been sent here for {} minutes because you have been naughty. I hope you use this time as a chance to reflect on your actions and come up with a formal apology for what you have done.\n\nFeel free to use `?timeleft` to see how much longer you have in timeout.".format(member.mention, minutes))
             
 
     async def remove_timeout(self, member):
@@ -135,14 +135,14 @@ class TimeoutTim(discord.Client):
             words = [x.strip() for x in message.content.split(' ')]
             if len(words) == 1:
                 if message.author.id in self.timedout:
-                    await channel.send("You have {} remaining in your timeout.".format(self.time_left(message.author)))
+                    await channel.send("You have {} remaining in timeout.".format(self.time_left(message.author)))
                     return
                 else:
                     await channel.send("You are not currently on timeout.")
                     return
             elif len(words) == 2 and (len(message.mentions) == 1):
                 if message.mentions[0].id in self.timedout:
-                    await channel.send("{} has {} remaining in your timeout.".format(message.mentions[0].name, self.time_left(message.mentions[0])))
+                    await channel.send("{} has {} remaining in timeout.".format(message.mentions[0].name, self.time_left(message.mentions[0])))
                     return
                 else:
                     await channel.send("{} is not currently on timeout.".format(message.mentions[0].name))
