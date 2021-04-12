@@ -6,7 +6,7 @@ DEBUG = True
 def log(s):
     if DEBUG:
         print(s)
-
+        
 token = os.getenv("DISCORD_BOT_TOKEN")
 
 class TimeoutTim(discord.Client):
@@ -14,9 +14,6 @@ class TimeoutTim(discord.Client):
         super().__init__(*args, **kwargs)
         self.timedout = dict()
         self.member_roles = dict()
-
-        self.role = 829884132976623667
-        self.timeout_channel = 829858090278322198
 
     def sec2str(self, time):
         h = int(time/3600)
@@ -82,6 +79,7 @@ class TimeoutTim(discord.Client):
         content = message.content
         user = message.author
         channel = message.channel
+        guild = message.guild
         TOchannel = discord.utils.get(message.guild.channels, name="timeout")
 
         if user == self.user:
@@ -104,7 +102,7 @@ class TimeoutTim(discord.Client):
             
             await channel.send(embed=e)
         elif message.content.startswith("~timeout "):
-            if (discord.utils.get(user.roles, name="Owner") is None) and (discord.utils.get(user.roles, name="Admin") is None) and (discord.utils.get(user.roles, name="Staff") is None):
+            if user.roles[-1].position < guild.get_member(self.user.id).roles[-1].position and not user.guild_permissions.administrator:
                 return
             
             words = [x.strip() for x in message.content.split(' ')]
