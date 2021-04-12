@@ -55,7 +55,7 @@ class TimeoutTim(discord.Client):
             
             self.timedout[member.id] = [datetime.now(), minutes*60, member]
             await channel.send("{} has been sent to the shadow realm for {}.".format(member.name, self.sec2str(minutes*60)))
-            await TOchannel.send("Hello, {}.\n\nYou have been sent here for {} minutes because you have been naughty. I hope you use this time as a chance to reflect on your actions and come up with a formal apology for what you have done.\n\nFeel free to use `?timeleft` to see how much longer you have in timeout.".format(member.mention, minutes))
+            await TOchannel.send("Hello, {}.\n\nYou have been sent here for {} minutes because you have been naughty. I hope you use this time as a chance to reflect on your actions and come up with a formal apology for what you have done.\n\nFeel free to use `~timeleft` to see how much longer you have in timeout.".format(member.mention, minutes))
             
 
     async def remove_timeout(self, member):
@@ -76,7 +76,7 @@ class TimeoutTim(discord.Client):
 
     async def on_ready(self):
         print(f'{client.user} has connected to Discord!')
-        await self.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="your behavior | ?help"))
+        await self.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="your behavior"))
 
     async def on_message(self, message):
         content = message.content
@@ -87,23 +87,23 @@ class TimeoutTim(discord.Client):
         if user == self.user:
             return
 
-        if message.content.startswith("?help"):
+        if message.content.startswith("~help"):
             e = discord.Embed(
                     title = "TimeoutTim Commands",
                     description = "Need to punish the naughty kids out there? He does it!",
                     color = 0x7dcac0
                 )
             e.set_thumbnail(url="https://i.imgur.com/vazfrxN.png")
-            e.add_field(name="?timeout @user [minutes in timeout]", value="Places @user in timeout for given amount of time.", inline=False)
-            e.add_field(name="?free @user", value="Frees @user from timeout.", inline=False)
-            e.add_field(name="?add @user [minutes to add to timeout]", value="Adds given amount of time to @user's timeout.", inline=False)
-            e.add_field(name="?timeleft", value="Gives time left in your timeout.", inline=False)
-            e.add_field(name="?timeleft @user", value="Gives time left in @user's timeout.", inline=False)
-            e.add_field(name="?help", value="What do you think this does?", inline=False)
+            e.add_field(name="~timeout @user [minutes in timeout]", value="Places @user in timeout for given amount of time.", inline=False)
+            e.add_field(name="~free @user", value="Frees @user from timeout.", inline=False)
+            e.add_field(name="~add @user [minutes to add to timeout]", value="Adds given amount of time to @user's timeout.", inline=False)
+            e.add_field(name="~timeleft", value="Gives time left in your timeout.", inline=False)
+            e.add_field(name="~timeleft @user", value="Gives time left in @user's timeout.", inline=False)
+            e.add_field(name="~help", value="What do you think this does?", inline=False)
 
             
             await channel.send(embed=e)
-        elif message.content.startswith("?timeout "):
+        elif message.content.startswith("~timeout "):
             if (discord.utils.get(user.roles, name="Owner") is None) and (discord.utils.get(user.roles, name="Admin") is None) and (discord.utils.get(user.roles, name="Staff") is None):
                 return
             
@@ -118,9 +118,10 @@ class TimeoutTim(discord.Client):
                 await channel.send("Invalid command. Please use `!timeout @user [minutes in timeout]`")
                 return
 
-        elif message.content.startswith("?free "):
+        elif message.content.startswith("~free "):
             if (discord.utils.get(user.roles, name="Owner") is None) and (discord.utils.get(user.roles, name="Admin") is None) and (discord.utils.get(user.roles, name="Staff") is None):
                 return
+            
             words = [x.strip() for x in message.content.split(' ')]
             if (len(words) != 2) or (len(message.mentions) != 1):
                 await channel.send("Invalid command. Please use `!free @user`")
@@ -131,7 +132,10 @@ class TimeoutTim(discord.Client):
             else:
                 await channel.send("{} is not currently on timeout.".format(message.mentions[0].name))
             
-        elif message.content.startswith("?timeleft"):
+        elif message.content.startswith("~timeleft"):
+            if channel.name != "timeout":
+                return
+            
             words = [x.strip() for x in message.content.split(' ')]
             if len(words) == 1:
                 if message.author.id in self.timedout:
@@ -151,7 +155,7 @@ class TimeoutTim(discord.Client):
                 await channel.send("Invalid command. Please use `!timeleft @user`")
                 return
 
-        elif message.content.startswith("?add "):
+        elif message.content.startswith("~add "):
             if (discord.utils.get(user.roles, name="Owner") is None) and (discord.utils.get(user.roles, name="Admin") is None) and (discord.utils.get(user.roles, name="Staff") is None):
                 return
             
