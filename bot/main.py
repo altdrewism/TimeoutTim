@@ -6,7 +6,7 @@ DEBUG = True
 def log(s):
     if DEBUG:
         print(s)
-        
+
 token = os.getenv("DISCORD_BOT_TOKEN")
 
 class TimeoutTim(discord.Client):
@@ -117,7 +117,7 @@ class TimeoutTim(discord.Client):
                 return
 
         elif message.content.startswith("~free "):
-            if (discord.utils.get(user.roles, name="Owner") is None) and (discord.utils.get(user.roles, name="Admin") is None) and (discord.utils.get(user.roles, name="Staff") is None):
+            if user.roles[-1].position < guild.get_member(self.user.id).roles[-1].position and not user.guild_permissions.administrator:
                 return
             
             words = [x.strip() for x in message.content.split(' ')]
@@ -154,7 +154,7 @@ class TimeoutTim(discord.Client):
                 return
 
         elif message.content.startswith("~add "):
-            if (discord.utils.get(user.roles, name="Owner") is None) and (discord.utils.get(user.roles, name="Admin") is None) and (discord.utils.get(user.roles, name="Staff") is None):
+            if user.roles[-1].position < guild.get_member(self.user.id).roles[-1].position and not user.guild_permissions.administrator:
                 return
             
             words = [x.strip() for x in message.content.split(' ')]
