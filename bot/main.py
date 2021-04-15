@@ -10,6 +10,7 @@ def log(s):
 token = os.getenv("DISCORD_BOT_TOKEN")
 
 class TimeoutTim(discord.Client):
+    TOchannel_name = "verification-room"
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.timedout = dict()
@@ -37,7 +38,7 @@ class TimeoutTim(discord.Client):
         return (self.timedout[member.id][1] - (datetime.now() - self.timedout[member.id][0]).seconds) < 0
 
     async def timeout(self, member, minutes, channel):
-        TOchannel = discord.utils.get(member.guild.channels, name="timeout")
+        TOchannel = discord.utils.get(member.guild.channels, name=self.TOchannel_name)
         if member.id in self.timedout:
             await channel.send("{} is already in timeout with {} remaining.".format(member.name, self.time_left(member)))
             return
@@ -80,7 +81,7 @@ class TimeoutTim(discord.Client):
         user = message.author
         channel = message.channel
         guild = message.guild
-        TOchannel = discord.utils.get(message.guild.channels, name="timeout")
+        TOchannel = discord.utils.get(message.guild.channels, name=self.TOchannel_name)
 
         if user == self.user:
             return
