@@ -178,6 +178,8 @@ class TimeoutTim(discord.Client):
             else:
                 await channel.send("Invalid command. Please use `~add @user [minutes to add to timeout]`")
                 return
+        elif message.content.startswith("-SR"):
+            await channel.send("https://splatoon2.ink/")
 
         
 
