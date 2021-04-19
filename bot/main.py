@@ -64,6 +64,8 @@ class TimeoutTim(discord.Client):
 
             self.timedout.pop(member.id)
             self.member_roles.pop(member.id)
+            TOchannel = discord.utils.get(member.guild.channels, name=self.TOchannel_name)
+            await TOchannel.send("{}'s timeout is over.".format(message.mentions[0].name))
         else:
             return
 
@@ -109,12 +111,19 @@ class TimeoutTim(discord.Client):
             words = [x.strip() for x in message.content.split(' ')]
             if (len(words) == 2) and (len(message.mentions) == 1):
                 minutes = 10
+
+                if message.mentions[0].roles[-1].position > guild.get_member(self.user.id).roles[-1].position:
+                    return
+                
                 await self.timeout(message.mentions[0], minutes, channel)
             elif (len(words) == 3) and (len(message.mentions) == 1) and (re.match('^[0-9]*$', words[2])):
+                if message.mentions[0].roles[-1].position > guild.get_member(self.user.id).roles[-1].position:
+                    return
+                
                 minutes = int(words[2])
                 await self.timeout(message.mentions[0], minutes, channel)
             else:
-                await channel.send("Invalid command. Please use `!timeout @user [minutes in timeout]`")
+                await channel.send("Invalid command. Please use `~timeout @user [minutes in timeout]`")
                 return
 
         elif message.content.startswith("~free "):
@@ -123,7 +132,7 @@ class TimeoutTim(discord.Client):
             
             words = [x.strip() for x in message.content.split(' ')]
             if (len(words) != 2) or (len(message.mentions) != 1):
-                await channel.send("Invalid command. Please use `!free @user`")
+                await channel.send("Invalid command. Please use `~free @user`")
                 return
             if message.mentions[0].id in self.timedout:
                 await self.remove_timeout(message.mentions[0])
@@ -151,7 +160,7 @@ class TimeoutTim(discord.Client):
                     await channel.send("{} is not currently on timeout.".format(message.mentions[0].name))
                     return
             else:
-                await channel.send("Invalid command. Please use `!timeleft @user`")
+                await channel.send("Invalid command. Please use `~timeleft @user`")
                 return
 
         elif message.content.startswith("~add "):
@@ -167,7 +176,7 @@ class TimeoutTim(discord.Client):
                 else:
                     await channel.send("{} is not currently on timeout.".format(message.mentions[0].name))
             else:
-                await channel.send("Invalid command. Please use `!add @user [minutes to add to timeout]`")
+                await channel.send("Invalid command. Please use `~add @user [minutes to add to timeout]`")
                 return
 
         
