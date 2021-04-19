@@ -183,7 +183,7 @@ class TimeoutTim(discord.Client):
         elif message.content.startswith("~loser "):
             words = [x.strip() for x in message.content.split(' ')]
             num = int(words[1])
-            loser = guild.fetch_member(628850295379722250)
+            loser = await guild.fetch_member(628850295379722250)
             if num > 15:
                 await channel.send("Max number of loser pings is 15.")
                 return
