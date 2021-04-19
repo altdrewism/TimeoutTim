@@ -180,6 +180,17 @@ class TimeoutTim(discord.Client):
                 return
         elif message.content.startswith("-SR"):
             await channel.send("https://splatoon2.ink/")
+        elif message.content.startswith("~loser "):
+            words = [x.strip() for x in message.content.split(' ')]
+            num = int(words[1])
+            loser = guild.fetch_member(628850295379722250)
+            if num > 15:
+                await channel.send("Max number of loser pings is 15.")
+                return
+
+            for i in range(0, num):
+                await channel.send("{}".format(loser.mention))
+            
 
         
 
