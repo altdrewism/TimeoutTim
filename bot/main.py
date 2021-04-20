@@ -30,7 +30,6 @@ class TimeoutTim(discord.Client):
         return time_str
 
     def time_left(self, member):
-        log("Time_Left")
         time = self.timedout[member.id][1] - (datetime.now() - self.timedout[member.id][0]).seconds
         return self.sec2str(time)
         
@@ -58,22 +57,49 @@ class TimeoutTim(discord.Client):
 
     async def remove_timeout(self, member):
         if member.id in self.timedout:
-            await member.remove_roles(discord.utils.get(member.guild.roles, name="Timeout"), reason="{} is done with timeout".format(member.name))
-            if self.member_roles[member.id]:
-                await member.add_roles(*self.member_roles[member.id], reason="{} is done with timeout".format(member.name))
+            try:
+                await member.remove_roles(discord.utils.get(member.guild.roles, name="Timeout"), reason="{} is done with timeout".format(member.name))
+                if self.member_roles[member.id]:
+                    await member.add_roles(*self.member_roles[member.id], reason="{} is done with timeout".format(member.name))
 
-            self.timedout.pop(member.id)
-            self.member_roles.pop(member.id)
-            TOchannel = discord.utils.get(member.guild.channels, name=self.TOchannel_name)
-            await TOchannel.send("{}'s timeout is over.".format(message.mentions[0].name))
+                self.timedout.pop(member.id)
+                self.member_roles.pop(member.id)
+                TOchannel = discord.utils.get(member.guild.channels, name=self.TOchannel_name)
+                await TOchannel.send("{}'s timeout is over.".format(member.name))
+            except:
+                self.timedout.pop(member.id)
+                self.member_roles.pop(member.id)
         else:
             return
 
     def add_time(self, member, minutes):
         self.timedout[member.id][1] = self.timedout[member.id][1] + 60*minutes
 
-        
+    def list(self):
+        desc = ""
+        for m in list(self.timedout):
+            member = self.timedout[m][2]
+            name = member.name
+            left = self.time_left(member)
+            desc += "{}, {} remaining\n".format(name, left)
 
+        if desc == "":
+            return False
+        
+        e = discord.Embed(
+                    title = "List of naughty kids",
+                    description = desc,
+                    color = 0x7dcac0
+                )
+        return e
+
+    async def clear(self):
+        for m in list(self.timedout):
+            member = self.timedout[m][2]
+            await self.remove_timeout(member)
+        self.timedout = dict()
+        self.member_roles = dict()
+    
     async def on_ready(self):
         print(f'{client.user} has connected to Discord!')
         await self.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="your behavior"))
@@ -95,12 +121,16 @@ class TimeoutTim(discord.Client):
                     color = 0x7dcac0
                 )
             e.set_thumbnail(url="https://i.imgur.com/vazfrxN.png")
-            e.add_field(name="~timeout @user [minutes in timeout]", value="Places @user in timeout for given amount of time.", inline=False)
-            e.add_field(name="~free @user", value="Frees @user from timeout.", inline=False)
-            e.add_field(name="~add @user [minutes to add to timeout]", value="Adds given amount of time to @user's timeout.", inline=False)
+            e.add_field(name="~timeout @user [minutes in timeout]", value="*Places @user in timeout for given amount of time.\nDefault time is 10 minutes if left blank.", inline=False)
+            e.add_field(name="~free @user", value="*Frees @user from timeout.", inline=False)
+            e.add_field(name="~add @user [minutes to add to timeout]", value="*Adds given amount of time to @user's timeout.", inline=False)
+            e.add_field(name="~clear", value="*Resets all timeouts.", inline=False)
+            e.add_field(name="~list", value="*Lists all users on timeout.", inline=False)
+            e.add_field(name="~loser [number of pings]", value="*Pings loser up to 30 times.", inline=False)
             e.add_field(name="~timeleft", value="Gives time left in your timeout.", inline=False)
             e.add_field(name="~timeleft @user", value="Gives time left in @user's timeout.", inline=False)
             e.add_field(name="~help", value="What do you think this does?", inline=False)
+            e.set_footer(text="*Admin use only")
 
             
             await channel.send(embed=e)
@@ -141,7 +171,7 @@ class TimeoutTim(discord.Client):
                 await channel.send("{} is not currently on timeout.".format(message.mentions[0].name))
             
         elif message.content.startswith("~timeleft"):
-            if channel.name != "timeout":
+            if channel.name != self.TOchannel_name:
                 return
             
             words = [x.strip() for x in message.content.split(' ')]
@@ -178,6 +208,24 @@ class TimeoutTim(discord.Client):
             else:
                 await channel.send("Invalid command. Please use `~add @user [minutes to add to timeout]`")
                 return
+        elif message.content.startswith("~list"):
+            if user.roles[-1].position < guild.get_member(self.user.id).roles[-1].position and not user.guild_permissions.administrator:
+                return
+
+            e = self.list()
+            if e:
+                await channel.send(embed=e)
+            else:
+                await channel.send("There are no naughty kids in timeout.")
+        elif message.content.startswith("~clear"):
+            if user.roles[-1].position < guild.get_member(self.user.id).roles[-1].position and not user.guild_permissions.administrator:
+                return
+            
+            await self.clear()
+            await channel.send("Timeouts reset.")
+
+
+            
         elif message.content.startswith("-SR"):
             await channel.send("https://splatoon2.ink/")
         elif message.content.startswith("~loser "):
@@ -200,12 +248,15 @@ class TimeoutTim(discord.Client):
     async def track_loop(self):
         await self.wait_until_ready()
 
-        for m in self.timedout:
+        for m in list(self.timedout):
             member = self.timedout[m][2]
-            
-            if self.check_timeout(member):
+            guild = member.guild
+            try:
+                await guild.fetch_member(member.id)
+                if self.check_timeout(member):
+                    await self.remove_timeout(member)
+            except:
                 await self.remove_timeout(member)
-                return
             
 
     
